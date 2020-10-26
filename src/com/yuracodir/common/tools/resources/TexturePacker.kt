@@ -5,7 +5,8 @@ import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import java.io.File
 
 class TexturesPacker(private val configuration: Configuration = Configuration()) {
-    class Configuration(
+
+    class Configuration @JvmOverloads constructor(
         val rawPath: String = "core/raw",
         val output: String = "core/res/atlas",
         val w: Int = 4096,

@@ -13,3 +13,7 @@ fun File.tree(): List<String> {
     }
     return items
 }
+
+fun String.escape(): String {
+    return replace("\\W".toRegex(), "_")
+}

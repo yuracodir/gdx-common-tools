@@ -3,22 +3,23 @@ package com.yuracodir.common.tools.resources
 import java.io.File
 
 class RClassPacker(private val configuration: Configuration = Configuration()) {
-    class Configuration(
-      val packageName: String? = null,
-      val sourceResourcesDir: String = "core/res",
-      val outputDir: String = "$sourceResourcesDir/../build/generated/resources",
-      val providers: List<ResourceProvider> = listOf(
-        ResourceLabelSkinIdProvider(),
-        ResourceSpriteIdProvider(),
-        ResourceFileIdProvider("atlas", mask = ".atlas"),
-        ResourceFileIdProvider("sounds", mask = ".ogg"),
-        ResourceFileIdProvider("particle", mask = ".part"),
-        ResourceFileIdProvider("font", mask = ".fnt"),
-        ResourceFileIdProvider("skin", mask = ".json"),
-        ResourceFileIdProvider("values", "locale", "^strings"),
-        ResourceIdProvider("color"),
-        ResourceIdProvider("string", true)
-      )
+
+    class Configuration @JvmOverloads constructor(
+        val packageName: String? = null,
+        val sourceResourcesDir: String = "core/res",
+        val outputDir: String = "$sourceResourcesDir/../build/generated/resources",
+        val providers: List<ResourceProvider> = listOf(
+            ResourceLabelSkinIdProvider(),
+            ResourceSpriteIdProvider(),
+            ResourceFileIdProvider("atlas", mask = ".atlas"),
+            ResourceFileIdProvider("sounds", mask = ".ogg"),
+            ResourceFileIdProvider("particle", mask = ".part"),
+            ResourceFileIdProvider("font", mask = ".fnt"),
+            ResourceFileIdProvider("skin", mask = ".json"),
+            ResourceFileIdProvider("values", "locale", "^strings"),
+            ResourceIdProvider("color"),
+            ResourceIdProvider("string", true)
+        )
     )
 
     private val providers = configuration.providers
@@ -28,8 +29,8 @@ class RClassPacker(private val configuration: Configuration = Configuration()) {
         File(configuration.sourceResourcesDir).tree()
             .map {
                 it.replace(
-                  configuration.sourceResourcesDir.trimEnd(File.pathSeparatorChar) + File.pathSeparator,
-                  ""
+                    configuration.sourceResourcesDir.trimEnd(File.pathSeparatorChar) + File.pathSeparator,
+                    ""
                 )
             }
             .map { File(it) }
@@ -46,8 +47,8 @@ class RClassPacker(private val configuration: Configuration = Configuration()) {
             }.joinToString("\n")
             .let {
                 val classContent = generateClass(configuration.packageName, it)
-                File(configuration.outputDir, "resources.kt")
-                    .apply { parentFile.mkdirs() }
+                val file = File(configuration.outputDir, "resources.kt")
+                file.apply { parentFile.mkdirs() }
                     .writeText(classContent)
             }
     }
@@ -88,7 +89,7 @@ class ResourceSpriteIdProvider : ResourceProvider {
         val readLines = file.readLines()
         return readLines.dropLast(1).mapIndexedNotNull { i, text ->
             if (!text.startsWith(" ") && readLines[i + 1].startsWith(" ")) {
-                text to text
+                text.escape() to text
             } else {
                 null
             }
@@ -112,8 +113,8 @@ class ResourceLabelSkinIdProvider : ResourceProvider {
             }
             if (labelBegin) {
                 "([A-z]+): \\{".toRegex().find(it)?.let {
-                  val (_, group) = it.groupValues
-                    group to group
+                    val (_, group) = it.groupValues
+                    group.escape() to group
                 }
             } else {
                 null
@@ -123,9 +124,9 @@ class ResourceLabelSkinIdProvider : ResourceProvider {
 }
 
 class ResourceFileIdProvider(
-  private val directory: String,
-  private val type: String = directory,
-  private val mask: String = ".*"
+    private val directory: String,
+    private val type: String = directory,
+    private val mask: String = ".*"
 ) : ResourceProvider {
     override fun forFile(file: File) = file.name.matches(".*$mask.*".toRegex())
 
@@ -133,7 +134,7 @@ class ResourceFileIdProvider(
 
     override fun get(file: File): Map<String, String> {
         if (file.parentFile.name == directory) {
-            val key = file.nameWithoutExtension.replace("\\W".toRegex(), "_")
+            val key = file.nameWithoutExtension.escape()
             val value = directory + "/" + file.name
             return mapOf(key to value)
         }
@@ -142,8 +143,8 @@ class ResourceFileIdProvider(
 }
 
 class ResourceIdProvider(
-  private val type: String,
-  private val keyToKey: Boolean = false
+    private val type: String,
+    private val keyToKey: Boolean = false
 ) : ResourceProvider {
     override fun forFile(file: File) = file.extension == "txt"
 
@@ -155,8 +156,8 @@ class ResourceIdProvider(
             .findAll(content)
             .mapNotNull { result ->
                 result.value.split(":").takeIf { it.size == 2 }?.let {
-                  val (key, value) = it
-                    key.replace("$type.", "") to if (keyToKey) key else value
+                    val (key, value) = it
+                    key.replace("$type.", "").escape() to if (keyToKey) key else value
                 }
             }.toMap()
     }
