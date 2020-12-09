@@ -100,7 +100,7 @@ class ResourceSpriteIdProvider : ResourceProvider {
 class ResourceLabelSkinIdProvider : ResourceProvider {
     override fun forFile(file: File) = file.extension == "json"
 
-    override fun getType() = "skin"
+    override fun getType() = "style"
 
     override fun get(file: File): Map<String, String> {
         var labelBegin = false
