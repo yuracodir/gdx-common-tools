@@ -107,6 +107,7 @@ class ResourceLabelSkinIdProvider : ResourceProvider {
         return file.readLines().mapNotNull {
             if (!labelBegin) {
                 labelBegin = it.startsWith("com.badlogic.gdx.scenes.scene2d.ui.Label\$LabelStyle:")
+                        || it.startsWith("LabelStyle:")
                 return@mapNotNull null
             } else if (it.startsWith("}")) {
                 labelBegin = false
