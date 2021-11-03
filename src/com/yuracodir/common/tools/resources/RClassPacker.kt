@@ -1,5 +1,8 @@
 package com.yuracodir.common.tools.resources
 
+import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonValue
+import com.badlogic.gdx.utils.ObjectMap
 import java.io.File
 
 class RClassPacker(private val configuration: Configuration = Configuration()) {
@@ -102,25 +105,16 @@ class ResourceLabelSkinIdProvider : ResourceProvider {
 
     override fun getType() = "style"
 
+    @Suppress("UNCHECKED_CAST")
     override fun get(file: File): Map<String, String> {
-        var labelBegin = false
-        return file.readLines().mapNotNull {
-            if (!labelBegin) {
-                labelBegin = it.startsWith("com.badlogic.gdx.scenes.scene2d.ui.Label\$LabelStyle:")
-                        || it.startsWith("LabelStyle:")
-                return@mapNotNull null
-            } else if (it.startsWith("}")) {
-                labelBegin = false
-            }
-            if (labelBegin) {
-                "([A-z]+): \\{".toRegex().find(it)?.let {
-                    val (_, group) = it.groupValues
-                    group.escape() to group
-                }
-            } else {
-                null
-            }
-        }.toMap()
+        val jsonMap = Json().fromJson(ObjectMap::class.java, file.readText())
+        val map = ObjectMap(jsonMap as ObjectMap<String, JsonValue>)
+
+        return jsonMap.keys()
+            .filter { it.contains("style", true) }
+            .flatMap { map[it] }
+            .map { it.name }
+            .associateBy { it.escape() }
     }
 }
 
