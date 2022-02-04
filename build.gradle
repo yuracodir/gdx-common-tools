@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.badlogicgames.gdx:gdx-tools:+"
+        classpath "com.badlogicgames.gdx:gdx-tools:1.10.0"
     }
 }
 
@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.badlogicgames.gdx:gdx-tools:+"
+    implementation 'com.badlogicgames.gdx:gdx-tools:1.10.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation 'com.github.jitpack:gradle-simple:1.0'
 }
