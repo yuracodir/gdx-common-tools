@@ -132,10 +132,10 @@ class ResourceFileIdProvider(
   override fun getType() = type
 
   override fun get(source: File, file: File): Map<String, String> {
-    val dir = file.parentFile.absolutePath.removePrefix(source.absolutePath + "/")
+    val dir = file.parentFile.absolutePath.removePrefix(source.absolutePath + File.separatorChar)
     if (dir.startsWith(directory)) {
       val key = file.nameWithoutExtension.escape()
-      val value = dir + "/" + file.name
+      val value = dir.fixPath() + "/" + file.name
       return mapOf(key to value)
     }
     return emptyMap()

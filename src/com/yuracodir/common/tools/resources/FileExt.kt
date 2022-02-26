@@ -17,3 +17,7 @@ fun File.tree(): List<String> {
 fun String.escape(): String {
     return replace("\\W".toRegex(), "_")
 }
+
+fun String.fixPath(): String {
+    return  this.replace("\\", "/")
+}
