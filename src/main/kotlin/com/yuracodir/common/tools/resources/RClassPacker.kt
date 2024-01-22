@@ -12,7 +12,7 @@ class RClassPacker(private val configuration: Configuration = Configuration()) {
     val sourceResourcesDir: String = "core/res",
     val outputDir: String = "$sourceResourcesDir/../build/generated/resources",
     val providers: MutableList<ResourceProvider> = mutableListOf(
-      ResourceLabelSkinIdProvider(),
+      ResourceLabelSkinIdProvider("skin"),
       ResourceSpriteIdProvider("atlas"),
       ResourceFileIdProvider("atlas", mask = ".atlas"),
       ResourceFileIdProvider("sounds", mask = ".ogg"),
@@ -85,27 +85,24 @@ interface ResourceProvider {
 }
 
 class ResourceSpriteIdProvider(private val directory: String) : ResourceProvider {
-  override fun forFile(file: File) = file.extension == "atlas"
+  override fun forFile(file: File) = file.parentFile.name == directory && file.extension == "atlas"
 
   override fun getType() = "sprite"
 
   override fun get(source: File, file: File): Map<String, String> {
-    if (file.parentFile.name == directory) {
-      val readLines = file.readLines()
-      return readLines.dropLast(1).mapIndexedNotNull { i, text ->
-        if (!text.startsWith(" ") && readLines[i + 1].startsWith(" ")) {
-          text.escape() to text
-        } else {
-          null
-        }
-      }.toMap()
-    }
-    return emptyMap()
+    val readLines = file.readLines()
+    return readLines.dropLast(1).mapIndexedNotNull { i, text ->
+      if (!text.startsWith(" ") && readLines[i + 1].startsWith(" ")) {
+        text.escape() to text
+      } else {
+        null
+      }
+    }.toMap()
   }
 }
 
-class ResourceLabelSkinIdProvider : ResourceProvider {
-  override fun forFile(file: File) = file.extension == "json"
+class ResourceLabelSkinIdProvider(private val directory: String) : ResourceProvider {
+  override fun forFile(file: File) = file.parentFile.name.startsWith(directory) && file.extension == "json"
 
   override fun getType() = "style"
 

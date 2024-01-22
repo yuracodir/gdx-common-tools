@@ -4,19 +4,22 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.badlogicgames.gdx:gdx-tools:1.10.0"
+        classpath "com.badlogicgames.gdx:gdx-tools:1.12.1"
     }
 }
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'org.jetbrains.kotlin.jvm' version "1.9.20"
+    id 'maven-publish'
 }
 
-group 'com.yuracodir.gdx.gdx-tools'
-version '1.0'
+group 'com.github.yuracodir'
+version '1.1'
 
-sourceSets.main.java.srcDirs = ["src/"]
-sourceSets.main.resources.srcDirs = ["res/"]
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
 
 repositories {
     mavenCentral()
@@ -24,7 +27,18 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.badlogicgames.gdx:gdx-tools:1.10.0'
+    implementation "com.badlogicgames.gdx:gdx-tools:1.12.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation 'com.github.jitpack:gradle-simple:1.0'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'com.github.yuracodir'
+            artifactId = 'gdx-common-tools'
+            version = '1.1'
+
+            from components.java
+        }
+    }
 }

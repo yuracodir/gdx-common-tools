@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.tools.texturepacker.TexturePacker
 import com.badlogic.gdx.tools.texturepacker.TexturePackerFileProcessor
 import java.io.File
+import java.util.Locale
 
 class TexturesPacker(private val configuration: Configuration = Configuration()) {
 
@@ -27,7 +28,7 @@ class TexturesPacker(private val configuration: Configuration = Configuration())
       val source = File(configuration.sourcePath)
       source
         .tree()
-        .filter { it.toLowerCase().endsWith(".png") }
+        .filter { it.lowercase(Locale.getDefault()).endsWith(".png") }
         .map { File(it).parentFile }
         .toSet().forEach {
           try {
